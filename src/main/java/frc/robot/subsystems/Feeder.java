@@ -10,14 +10,14 @@ public class Feeder extends SubsystemBase{
         
     }
 public void turnFeederOn(){
-    FeederMotor.set(1);
+    FeederMotor.set(-1);
 
 }
 public void turnFeederOff(){
     FeederMotor.set(0);
 }
 public void reverseFeeder(){
-    FeederMotor.set(-1);
+    FeederMotor.set(1);
 }
 public void reverseFeederOff(){
     FeederMotor.set(0);

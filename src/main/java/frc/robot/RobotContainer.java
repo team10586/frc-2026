@@ -10,6 +10,8 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -26,8 +28,10 @@ import frc.robot.subsystems.Intake;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+    private double MaxAngularRate = RotationsPerSecond.  of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
     boolean twoDrivers = false;
+    public double distanceToTag=1;
+    // NetworkTable table= NetworkTableInstance.getDefault().getTable("limelight");
     double limelight_aim_proportional()
     {    
         // kP (constant of proportionality)
@@ -36,11 +40,25 @@ public class RobotContainer {
         // if it is too low, the robot will never reach its target     
         // if the robot never turns in the correct direction, kP should be inverted.
         double kP = .025;
+        // distanceToTag = table.getEntry("botpose").getDouble(1.0);
+        double hey =  LimelightHelpers.getLatestResults("limelight").botpose_avgdist;
+        if (hey!=0.0){
 
+            distanceToTag =hey;
+
+
+        }else{
+        // distanceToTag =9;
+
+        }
+        
+        
+        System.out.println(distanceToTag);
         // tx ranges from (-hfov/2) to (hfov/2) in degrees. If your target is on the rightmost edge of 
         // your limelight 3 feed, tx should return roughly 31 degrees.
         double targetingAngularVelocity = LimelightHelpers.getTX("limelight") * kP;
-
+        
+        // LimelightHelpers.getBotPose(null);
         // convert to radians per second for our drive method
         targetingAngularVelocity *= 3.14;
 
@@ -62,7 +80,7 @@ public class RobotContainer {
     private final CommandXboxController opController = new CommandXboxController(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-    public final Intake WALL_E_Intake = new Intake();
+    public final Intake WALL_E_Intake = new Intake(this);
     public final Feeder Feeder_WALL_E = new Feeder();
     
     public RobotContainer() {
@@ -175,9 +193,11 @@ public class RobotContainer {
                     .withVelocityY(0)
                     .withRotationalRate(0)
             )
-            .withTimeout(5.0),
+            .withTimeout(3.0),
             // Finally idle for the rest of auton
             drivetrain.applyRequest(() -> idle)
-        );
+        
+            
+    );
     }
 }
