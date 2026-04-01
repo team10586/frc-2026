@@ -29,7 +29,7 @@ import frc.robot.subsystems.Intake;
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.  of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
-    boolean twoDrivers = false;
+    boolean twoDrivers = true;
     public double distanceToTag=1;
     // NetworkTable table= NetworkTableInstance.getDefault().getTable("limelight");
     double limelight_aim_proportional()
@@ -150,6 +150,8 @@ public class RobotContainer {
             opController.y().onFalse (new InstantCommand(()->WALL_E_Intake.SpeedyShootOff()));
             opController.rightTrigger().onTrue(new InstantCommand(()->WALL_E_Intake.IntakeOnly()));
             opController.rightTrigger().onFalse(new InstantCommand(()->WALL_E_Intake.IntakeOnlyOff()));
+            // opController.a().onTrue (new InstantCommand(()->WALL_E_Intake.IncreaseSpeed()));
+            // opController.b().onTrue(new InstantCommand(()->WALL_E_Intake.DecreaseSpeed()));
 
 
 
@@ -164,7 +166,7 @@ public class RobotContainer {
             //drivController.y().onFalse (new InstantCommand(()->WALL_E_Intake.SpeedyShootOff()));
             //drivController.rightTrigger().onTrue(new InstantCommand(()->WALL_E_Intake.IntakeOnly()));
             //drivController.rightTrigger().onFalse(new InstantCommand(()->WALL_E_Intake.IntakeOnlyOff()));
-        drivController.leftTrigger().onTrue(new InstantCommand( ()-> WALL_E_Intake.turnIntakeOn()));
+            drivController.leftTrigger().onTrue(new InstantCommand( ()-> WALL_E_Intake.turnIntakeOn()));
             drivController.leftTrigger().onFalse(new InstantCommand( ()-> WALL_E_Intake.turnIntakeOff()));
             drivController.rightBumper().onTrue(new InstantCommand(()-> Feeder_WALL_E.turnFeederOn()));
             drivController.rightBumper().onFalse(new InstantCommand(()-> Feeder_WALL_E.turnFeederOff()));
