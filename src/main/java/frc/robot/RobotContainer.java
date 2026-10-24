@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
@@ -29,7 +30,7 @@ import frc.robot.subsystems.Intake;
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.  of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
-    boolean twoDrivers = true;
+    boolean twoDrivers = false;
     public double distanceToTag=1;
     // NetworkTable table= NetworkTableInstance.getDefault().getTable("limelight");
     double limelight_aim_proportional()
@@ -191,13 +192,23 @@ public class RobotContainer {
             drivetrain.runOnce(() -> drivetrain.seedFieldCentric(Rotation2d.kZero)),
             // Then slowly drive forward (away from us) for 5 seconds.
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(0.5)
+                drive.withVelocityX(.5)
                     .withVelocityY(0)
                     .withRotationalRate(0)
             )
-            .withTimeout(3.0),
+            public void flywheelSpeed = 60
+            .withTimeout(1.5),
             // Finally idle for the rest of auton
-            drivetrain.applyRequest(() -> idle)
+            drivetrain.applyRequest(() -> idle).withTimeout(0.1),
+            new InstantCommand(()-> WALL_E_Intake.flywheelSpeed(50.0)),
+            new InstantCommand( ()-> WALL_E_Intake.turnIntakeOn()),
+            new WaitCommand(4.0),
+            new InstantCommand(()-> Feeder_WALL_E.reverseFeeder()),
+            new WaitCommand(10),
+        new InstantCommand(()->WALL_E_Intake.turnIntakeOff()),
+        new InstantCommand(()->Feeder_WALL_E.turnFeederOff())
+
+
         
             
     );
