@@ -120,7 +120,7 @@ public class LimelightHelpers {
         @JsonProperty("tx_nocross")
         public double tx_nocrosshair;
 
-        @JsonProperty("ty_nocross")
+        @JsonProperty("ty_nowcross")
         public double ty_nocrosshair;
 
         @JsonProperty("ts")
@@ -1081,7 +1081,7 @@ public class LimelightHelpers {
             return;
         }
     
-        System.out.printf("Pose Estimate Information:%n");
+        System.out.printf("Pose    Estimate Information:%n");
         System.out.printf("Timestamp (Seconds): %.3f%n", pose.timestampSeconds);
         System.out.printf("Latency: %.3f ms%n", pose.latency);
         System.out.printf("Tag Count: %d%n", pose.tagCount);

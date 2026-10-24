@@ -7,12 +7,18 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -21,7 +27,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Feeder;
@@ -30,7 +35,7 @@ import frc.robot.subsystems.Intake;
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.  of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
-    boolean twoDrivers = false;
+    //boolean twoDrivers = true;
     public double distanceToTag=1;
     // NetworkTable table= NetworkTableInstance.getDefault().getTable("limelight");
     double limelight_aim_proportional()
@@ -83,9 +88,21 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     public final Intake WALL_E_Intake = new Intake(this);
     public final Feeder Feeder_WALL_E = new Feeder();
+
+    // private final SendableChooser<Command> autoChooser;
     
     public RobotContainer() {
         configureBindings();
+        // autoChooser = AutoBuilder.buildAutoChooser();
+        // SmartDashboard.putData("Auto Chooser", autoChooser);
+    }
+
+    public Pose2d getPose() {
+        return drivetrain.getState().Pose;
+    }
+
+    public ChassisSpeeds getChasSpeed() {
+        return drivetrain.getState().Speeds;
     }
 
     private void configureBindings() {
@@ -125,7 +142,7 @@ public class RobotContainer {
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
 
-        drivController.a().whileTrue(drivetrain.applyRequest(() -> brake));
+    
         drivController.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-drivController.getLeftY(), -drivController.getLeftX()))
         ));
@@ -140,7 +157,7 @@ public class RobotContainer {
         // Reset the field-centric heading on left bumper press.
         drivController.povDown().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
         // WALL_E_Intake
-        if(twoDrivers){
+      
             opController.leftTrigger().onTrue(new InstantCommand( ()-> WALL_E_Intake.turnIntakeOn()));
             opController.leftTrigger().onFalse(new InstantCommand( ()-> WALL_E_Intake.turnIntakeOff()));
             opController.rightBumper().onTrue(new InstantCommand(()-> Feeder_WALL_E.turnFeederOn()));
@@ -156,29 +173,7 @@ public class RobotContainer {
 
 
 
-        } else {
-             // drivController.rightTrigger().onTrue(new InstantCommand( ()-> WALL_E_Intake.turnIntakeOn()));
-            //drivController.rightTrigger().onFalse(new InstantCommand( ()-> WALL_E_Intake.turnIntakeOff()));
-           // drivController.leftBumper().onTrue(new InstantCommand(()-> Feeder_WALL_E.turnFeederOn()));
-            //drivController.leftBumper().onFalse(new InstantCommand(()-> Feeder_WALL_E.turnFeederOff()));
-            //drivController.leftTrigger().onTrue(new InstantCommand(()-> Feeder_WALL_E.reverseFeeder()));
-            //drivController.leftTrigger().onFalse(new InstantCommand(()-> Feeder_WALL_E.reverseFeederOff()));
-            //drivController.y().onTrue (new InstantCommand(()->WALL_E_Intake.SpeedyShoot()));
-            //drivController.y().onFalse (new InstantCommand(()->WALL_E_Intake.SpeedyShootOff()));
-            //drivController.rightTrigger().onTrue(new InstantCommand(()->WALL_E_Intake.IntakeOnly()));
-            //drivController.rightTrigger().onFalse(new InstantCommand(()->WALL_E_Intake.IntakeOnlyOff()));
-            drivController.leftTrigger().onTrue(new InstantCommand( ()-> WALL_E_Intake.turnIntakeOn()));
-            drivController.leftTrigger().onFalse(new InstantCommand( ()-> WALL_E_Intake.turnIntakeOff()));
-            drivController.rightBumper().onTrue(new InstantCommand(()-> Feeder_WALL_E.turnFeederOn()));
-            drivController.rightBumper().onFalse(new InstantCommand(()-> Feeder_WALL_E.turnFeederOff()));
-            drivController.leftBumper().onTrue(new InstantCommand(()-> Feeder_WALL_E.reverseFeeder()));
-            drivController.leftBumper().onFalse(new InstantCommand(()-> Feeder_WALL_E.reverseFeederOff()));
-            drivController.y().onTrue (new InstantCommand(()->WALL_E_Intake.SpeedyShoot()));
-            drivController.y().onFalse (new InstantCommand(()->WALL_E_Intake.SpeedyShootOff()));
-            drivController.rightTrigger().onTrue(new InstantCommand(()->WALL_E_Intake.IntakeOnly()));
-            drivController.rightTrigger().onFalse(new InstantCommand(()->WALL_E_Intake.IntakeOnlyOff()));
-
-        }
+       
         
         drivetrain.registerTelemetry(logger::telemeterize);
     }
@@ -196,21 +191,17 @@ public class RobotContainer {
                     .withVelocityY(0)
                     .withRotationalRate(0)
             )
-            public void flywheelSpeed = 60
-            .withTimeout(1.5),
+            .withTimeout(2.0),
             // Finally idle for the rest of auton
             drivetrain.applyRequest(() -> idle).withTimeout(0.1),
-            new InstantCommand(()-> WALL_E_Intake.flywheelSpeed(50.0)),
+            //new InstantCommand(()-> WALL_E_Intake.setTargetSpeed(60.0)),
             new InstantCommand( ()-> WALL_E_Intake.turnIntakeOn()),
-            new WaitCommand(4.0),
+            new WaitCommand(2.0),
             new InstantCommand(()-> Feeder_WALL_E.reverseFeeder()),
             new WaitCommand(10),
-        new InstantCommand(()->WALL_E_Intake.turnIntakeOff()),
-        new InstantCommand(()->Feeder_WALL_E.turnFeederOff())
+        new InstantCommand(()->WALL_E_Intake.turnIntakeOff())
+        );
 
-
-        
-            
-    );
+        // return autoChooser.getSelected(); //non-hardcoded auto-selection ;)
     }
 }
